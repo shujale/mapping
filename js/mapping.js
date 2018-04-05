@@ -3,18 +3,18 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoic2h1amFsZSIsImEiOiJjamZtZHNweGEweTdjMnFteHBrM
 var map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/shujale/cjfkzadbxg48d2sp60a9q0p2a',
-  bearing: 11.20,
-  center: [-73.995911, 40.731478],
-  zoom: 17.69,
-  pitch: 38.00
+  bearing: 33.12,
+  center: [-73.995412, 40.730987],
+  zoom: 18.05,
+  pitch: 0.00
 });
 
 var chapters = {
   'washingtonmews': {
-    bearing: 11.20,
-    center: [-73.995911, 40.731478],
-    zoom: 17.69,
-    pitch: 38.00
+    bearing: 33.12,
+    center: [-73.995412, 40.730987],
+    zoom: 18.05,
+    pitch: 0.00
   },
   'newjersey': {
     duration: 6000,
