@@ -1,92 +1,119 @@
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2h1amFsZSIsImEiOiJjamZtZHNweGEweTdjMnFteHBrM3Voa3F1In0.NxLgeQc5wS3KH-AEcJYzzg';
 
 var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/shujale/cjfkzadbxg48d2sp60a9q0p2a',
-    center: [-0.15591514, 51.51830379],
-    zoom: 15.5,
-    bearing: 27,
-    pitch: 45
+  container: 'map',
+  style: 'mapbox://styles/shujale/cjfkzadbxg48d2sp60a9q0p2a',
+  bearing: 11.20,
+  center: [-73.995911, 40.731478],
+  zoom: 17.69,
+  pitch: 38.00
 });
 
 var chapters = {
-    'baker': {
-        bearing: 27,
-        center: [-0.15591514, 51.51830379],
-        zoom: 15.5,
-        pitch: 20
-    },
-    'aldgate': {
-        duration: 6000,
-        center: [-0.07571203, 51.51424049],
-        bearing: 150,
-        zoom: 15,
-        pitch: 0
-    },
-    'london-bridge': {
-        bearing: 90,
-        center: [-0.08533793, 51.50438536],
-        zoom: 13,
-        speed: 0.6,
-        pitch: 40
-    },
-    'woolwich': {
-        bearing: 90,
-        center: [0.05991101, 51.48752939],
-        zoom: 12.3
-    },
-    'gloucester': {
-        bearing: 45,
-        center: [-0.18335806, 51.49439521],
-        zoom: 15.3,
-        pitch: 20,
-        speed: 0.5
-    },
-    'caulfield-gardens': {
-        bearing: 180,
-        center: [-0.19684993, 51.5033856],
-        zoom: 12.3
-    },
-    'telegraph': {
-        bearing: 90,
-        center: [-0.10669358, 51.51433123],
-        zoom: 17.3,
-        pitch: 40
-    },
-    'charing-cross': {
-        bearing: 90,
-        center: [-0.12416858, 51.50779757],
-        zoom: 14.3,
-        pitch: 20
-    }
+  'washingtonmews': {
+    bearing: 11.20,
+    center: [-73.995911, 40.731478],
+    zoom: 17.69,
+    pitch: 38.00
+  },
+  'newjersey': {
+    duration: 6000,
+    center: [-74.215621, 40.666913],
+    bearing: 11.12,
+    zoom: 16.00,
+    pitch: 60.00
+  },
+  'washingtonmews2': {
+    bearing: 11.20,
+    center: [-73.995911, 40.731478],
+    zoom: 17.69,
+    pitch: 38.00
+  },
+  'newjersey2': {
+    duration: 6000,
+    center: [-74.215621, 40.666913],
+    bearing: 11.12,
+    zoom: 16.00,
+    pitch: 60.00
+  },
+  'washingtonmews3': {
+    bearing: 11.20,
+    center: [-73.995911, 40.731478],
+    zoom: 17.69,
+    pitch: 38.00
+  }
 };
 
 // On every scroll event, check which element is on screen
 window.onscroll = function() {
-    var chapterNames = Object.keys(chapters);
-    for (var i = 0; i < chapterNames.length; i++) {
-        var chapterName = chapterNames[i];
-        if (isElementOnScreen(chapterName)) {
-            setActiveChapter(chapterName);
-            break;
-        }
+  var chapterNames = Object.keys(chapters);
+  for (var i = 0; i < chapterNames.length; i++) {
+    var chapterName = chapterNames[i];
+    if (isElementOnScreen(chapterName)) {
+      setActiveChapter(chapterName);
+      break;
     }
+  }
 };
 
-var activeChapterName = 'baker';
+var activeChapterName = 'washingtonmews';
+
 function setActiveChapter(chapterName) {
-    if (chapterName === activeChapterName) return;
+  if (chapterName === activeChapterName) return;
 
-    map.flyTo(chapters[chapterName]);
+  map.flyTo(chapters[chapterName]);
 
-    document.getElementById(chapterName).setAttribute('class', 'active');
-    document.getElementById(activeChapterName).setAttribute('class', '');
+  document.getElementById(chapterName).setAttribute('class', 'active');
+  document.getElementById(activeChapterName).setAttribute('class', '');
 
-    activeChapterName = chapterName;
+  activeChapterName = chapterName;
 }
 
 function isElementOnScreen(id) {
-    var element = document.getElementById(id);
-    var bounds = element.getBoundingClientRect();
-    return bounds.top < window.innerHeight && bounds.bottom > 0;
+  var element = document.getElementById(id);
+  var bounds = element.getBoundingClientRect();
+  return bounds.top < window.innerHeight && bounds.bottom > 0;
 }
+
+// The 'building' layer in the mapbox-streets vector source contains building-height
+// data from OpenStreetMap.
+map.on('load', function() {
+  // Insert the layer beneath any symbol layer.
+  var layers = map.getStyle().layers;
+
+  var labelLayerId;
+  for (var i = 0; i < layers.length; i++) {
+    if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+      labelLayerId = layers[i].id;
+      break;
+    }
+  }
+
+  map.addLayer({
+    'id': '3d-buildings',
+    'source': 'composite',
+    'source-layer': 'building',
+    'filter': ['==', 'extrude', 'true'],
+    'type': 'fill-extrusion',
+    'minzoom': 15,
+    'paint': {
+      'fill-extrusion-color': '#aaa',
+
+      // use an 'interpolate' expression to add a smooth transition effect to the
+      // buildings as the user zooms in
+      'fill-extrusion-height': [
+        "interpolate", ["linear"],
+        ["zoom"],
+        15, 0,
+        15.05, ["get", "height"]
+      ],
+      'fill-extrusion-base': [
+        "interpolate", ["linear"],
+        ["zoom"],
+        15, 0,
+        15.05, ["get", "min_height"]
+      ],
+      'fill-extrusion-opacity': .6
+    }
+  }, labelLayerId);
+});
